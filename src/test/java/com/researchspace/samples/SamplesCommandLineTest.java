@@ -106,8 +106,8 @@ public class SamplesCommandLineTest{
 		when(consoleReaderMock.read(anyString())).thenReturn("Y").thenReturn("N");
 		samplesCommandLine.run(new String[0]);
 		
-		verify(consoleWriterMock, times(1)).println("Name                 | Min Temp/°C     | Max Temp/°C     | Expiry Date          \r\n");	
-		verify(consoleWriterMock, times(1)).println("Sample1              | 10              | 10              | 2021-10-25           \r\n");
+		verify(consoleWriterMock, times(1)).println(String.format("Name                 | Min Temp/°C     | Max Temp/°C     | Expiry Date          %n"));	
+		verify(consoleWriterMock, times(1)).println(String.format("Sample1              | 10              | 10              | 2021-10-25           %n"));
 	}
 	
 	@Test
@@ -139,8 +139,8 @@ public class SamplesCommandLineTest{
 		when(consoleReaderMock.read(anyString())).thenReturn("Y");
 		samplesCommandLine.run(new String[0]);
 		
-		verify(consoleWriterMock, times(1)).println("Sample1              | 10              | 10              | "+ expiryFormat.format(new Date().getTime() + 86400000 * 3) +"           \r\n");
-		verify(consoleWriterMock, times(2)).println("Sample2              | 10              | 10              | "+ expiryFormat.format(new Date().getTime() + 86400000) +"           \r\n");
+		verify(consoleWriterMock, times(1)).println(String.format("Sample1              | 10              | 10              | "+ expiryFormat.format(new Date().getTime() + 86400000 * 3) +"           %n"));
+		verify(consoleWriterMock, times(2)).println(String.format("Sample2              | 10              | 10              | "+ expiryFormat.format(new Date().getTime() + 86400000) +"           %n"));
 	}
 	
 	
