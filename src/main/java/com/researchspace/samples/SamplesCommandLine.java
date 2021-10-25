@@ -64,6 +64,14 @@ public class SamplesCommandLine implements CommandLineRunner {
 			displaySamples(samplesResponse.getSamples());
 		}
 
+		
+		var viewExpiring = reader.read("View sample due to expire soon? (Y/N): ");
+		
+		if(!viewExpiring.equalsIgnoreCase("y")) { 
+			exitApp.exit(0,"Thank you for using sample viewer");
+		}else {
+			displaySamples(getExpiringSamples(samplesResponse.getSamples()));
+		}
 	}
 	
 	private void displaySamples(List<Sample> samples) {
@@ -82,6 +90,30 @@ public class SamplesCommandLine implements CommandLineRunner {
 				sample.getStorageTempMax() == null ? null : sample.getStorageTempMax().getNumericValue().longValue(),
 				sample.getExpiryDate()));	
 		}
+	}
+	
+	private List<Sample> getExpiringSamples(List<Sample> samples) {
+		SimpleDateFormat expiryFormat = new SimpleDateFormat("yyyy-MM-dd");
+		
+		// Get list of samples which have no expiry date configured
+		List<String> noExpirySamples = new ArrayList<>();
+		
+		List<Sample> expiringSamples = samples.stream().filter(s -> {
+			try {
+				if(s.getExpiryDate() == null) {
+					noExpirySamples.add(s.getName());
+				}else {
+					return new Date().getTime()  > expiryFormat.parse(s.getExpiryDate()).getTime()  - (86400000 * 2);
+				}
+			}catch (ParseException e) {
+				log.error(String.format("Error parsing date %1$s for sample %2$s", s.getExpiryDate(), s.getName()));
+			} 
+			return false;
+		}).collect(Collectors.toList());
+		
+		writer.println(String.format("The following samples did not have a valid expiry date %n %1$s", noExpirySamples));
+		
+		return expiringSamples;
 	}
 
 }
